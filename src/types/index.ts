@@ -23,7 +23,6 @@ export type Action =
   | { type: 'CHANGE_SPEED'; payload: number }
   | { type: 'SET_SEARCH_TERM'; payload: string }
   | { type: 'CHANGE_PAGE'; payload: number }
-  | { type: 'TOGGLE_PRO_MODE'; payload: boolean }
   | { type: 'TOGGLE_SELECTION'; payload: number }
   | { type: 'TOGGLE_ALL_SELECTION'; payload: { ids: number[], checked: boolean } }
   | { type: 'BATCH_DELETE' }

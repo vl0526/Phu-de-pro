@@ -73,9 +73,6 @@ const reducer = (state: HistoryState, action: Action): HistoryState => {
     case 'CHANGE_PAGE':
       // This is a UI-only state change, does not affect history
       return { ...state, history: state.history.map((s, i) => i === state.currentIndex ? {...s, currentPage: action.payload} : s) };
-    case 'TOGGLE_PRO_MODE':
-      // This is a UI-only state change, does not affect history
-      return { ...state, history: state.history.map((s, i) => i === state.currentIndex ? {...s, isProMode: action.payload} : s) };
     case 'TOGGLE_SELECTION': {
       const newSelectedIds = new Set(currentEditorState.selectedIds);
       if (newSelectedIds.has(action.payload)) {

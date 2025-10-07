@@ -1,11 +1,9 @@
 "use client";
 
 import React, { useRef } from 'react';
-import { Upload, Download, Settings2 } from 'lucide-react';
+import { Upload, Download } from 'lucide-react';
 import { useSubtitleEditor } from '@/contexts/subtitle-editor-context';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 import { AppLogo } from '@/components/icons';
 import { stringifySrt } from '@/lib/srt-utils';
 import { useToast } from '@/hooks/use-toast';
@@ -75,14 +73,6 @@ export function AppHeader() {
         <h1 className="text-xl font-bold font-headline text-foreground">Sub Edit Pro</h1>
       </div>
       <div className="flex items-center gap-4">
-        <div className="flex items-center space-x-2">
-          <Label htmlFor="pro-mode-switch">BẬT MẶC ĐỊNH</Label>
-          <Switch
-            id="pro-mode-switch"
-            checked={state.isProMode}
-            onCheckedChange={(checked) => dispatch({ type: 'TOGGLE_PRO_MODE', payload: checked })}
-          />
-        </div>
         <input
           type="file"
           ref={fileInputRef}
