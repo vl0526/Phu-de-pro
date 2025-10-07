@@ -22,15 +22,15 @@ export function AppHeader() {
         const content = e.target?.result as string;
         dispatch({ type: 'LOAD_SRT', payload: { content, fileName: file.name } });
         dispatch({ type: 'SET_PROCESSING', payload: { isProcessing: false, progress: 100 } });
-        toast({ variant: "success", title: "Tải tệp lên thành công", description: `${file.name} đã được tải lên và xử lý.` });
+        toast({ variant: "success", title: "Tải tệp lên thành công" });
       };
       reader.onerror = () => {
         dispatch({ type: 'SET_PROCESSING', payload: { isProcessing: false, progress: 0 } });
-        toast({ variant: "destructive", title: "Lỗi", description: "Không thể đọc tệp." });
+        toast({ variant: "destructive", title: "Không thể đọc tệp" });
       };
       reader.readAsText(file);
     } else {
-      toast({ variant: "destructive", title: "Tệp không hợp lệ", description: "Vui lòng chỉ tải lên tệp có định dạng .srt" });
+      toast({ variant: "destructive", title: "Tệp không hợp lệ" });
     }
     // Reset file input to allow uploading the same file again
     if(event.target) {
@@ -44,7 +44,7 @@ export function AppHeader() {
 
   const handleExport = () => {
     if (state.subtitles.length === 0) {
-      toast({ variant: "destructive", title: "Không có dữ liệu", description: "Không có phụ đề để xuất." });
+      toast({ variant: "destructive", title: "Không có phụ đề để xuất" });
       return;
     }
     try {
@@ -59,10 +59,10 @@ export function AppHeader() {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      toast({ variant: "success", title: "Xuất tệp thành công", description: `Đã tải về ${newFileName}` });
+      toast({ variant: "success", title: "Xuất tệp thành công" });
     } catch (error) {
       console.error("Export failed:", error);
-      toast({ variant: "destructive", title: "Xuất tệp thất bại", description: "Đã có lỗi xảy ra. Vui lòng thử lại." });
+      toast({ variant: "destructive", title: "Xuất tệp thất bại" });
     }
   };
 

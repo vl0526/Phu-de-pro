@@ -27,7 +27,7 @@ export function Toolbar() {
 
   const handleSpeedChange = (newSpeed: number) => {
     if (isNaN(newSpeed) || newSpeed <= 0) {
-      toast({ variant: "destructive", title: "Tốc độ không hợp lệ", description: "Vui lòng nhập một số dương." });
+      toast({ variant: "destructive", title: "Tốc độ không hợp lệ" });
       return;
     }
     dispatch({ type: 'CHANGE_SPEED', payload: newSpeed });
@@ -40,11 +40,11 @@ export function Toolbar() {
   
   const handleBatchDelete = () => {
     if (selectedIds.size === 0) {
-      toast({ variant: "destructive", title: "Chưa chọn mục nào", description: "Vui lòng chọn các dòng phụ đề cần xóa." });
+      toast({ variant: "destructive", title: "Chưa chọn mục nào" });
       return;
     }
     dispatch({ type: 'BATCH_DELETE' });
-    toast({ title: "Xóa thành công", description: `Đã xóa ${selectedIds.size} dòng phụ đề.` });
+    toast({ title: `Đã xóa ${selectedIds.size} dòng` });
   }
 
   return (
