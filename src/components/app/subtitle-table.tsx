@@ -16,8 +16,37 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { formatMsToTime } from '@/lib/srt-utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
 
 const ROWS_PER_PAGE = 100;
+
+const EditableCell = ({ subId, initialText }: { subId: number, initialText: string }) => {
+    const { dispatch } = useSubtitleEditor();
+    const [text, setText] = useState(initialText);
+
+    useEffect(() => {
+        setText(initialText);
+    }, [initialText]);
+    
+    const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setText(e.target.value);
+    };
+
+    const handleBlur = () => {
+        dispatch({ type: 'UPDATE_SUBTITLE_TEXT', payload: { id: subId, text } });
+    };
+
+    return (
+        <Textarea
+            value={text}
+            onChange={handleTextChange}
+            onBlur={handleBlur}
+            className="w-full bg-transparent border-none focus-visible:ring-1 focus-visible:ring-ring p-0"
+            rows={text.split('\n').length}
+        />
+    );
+};
+
 
 export function SubtitleTable() {
   const { state, dispatch } = useSubtitleEditor();
@@ -131,7 +160,9 @@ export function SubtitleTable() {
                     <span className="text-muted-foreground">{formatMsToTime(sub.end)}</span>
                   </div>
                 </TableCell>
-                <TableCell className="whitespace-pre-wrap">{sub.text}</TableCell>
+                <TableCell className="whitespace-pre-wrap">
+                  <EditableCell subId={sub.id} initialText={sub.text} />
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

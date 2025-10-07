@@ -27,5 +27,6 @@ export type Action =
   | { type: 'TOGGLE_ALL_SELECTION'; payload: { ids: number[], checked: boolean } }
   | { type: 'BATCH_DELETE' }
   | { type: 'SET_PROCESSING'; payload: { isProcessing: boolean; progress: number } }
+  | { type: 'UPDATE_SUBTITLE_TEXT'; payload: { id: number; text: string } }
   | { type: 'UNDO' }
   | { type: 'REDO' };

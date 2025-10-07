@@ -67,6 +67,20 @@ const reducer = (state: HistoryState, action: Action): HistoryState => {
       }));
       return updateHistory({ ...currentEditorState, subtitles: newSubtitles, speed: newSpeed });
     }
+    case 'UPDATE_SUBTITLE_TEXT': {
+        const { id, text } = action.payload;
+        const newSubtitles = currentEditorState.subtitles.map(sub =>
+            sub.id === id ? { ...sub, text } : sub
+        );
+        const newOriginalSubtitles = currentEditorState.originalSubtitles.map(sub =>
+            sub.id === id ? { ...sub, text } : sub
+        );
+        return updateHistory({ 
+            ...currentEditorState, 
+            subtitles: newSubtitles,
+            originalSubtitles: newOriginalSubtitles
+        });
+    }
     case 'SET_SEARCH_TERM':
       // This is a UI-only state change, does not affect history
       return { ...state, history: state.history.map((s, i) => i === state.currentIndex ? {...s, searchTerm: action.payload} : s) };
