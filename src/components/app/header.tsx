@@ -22,7 +22,7 @@ export function AppHeader() {
         const content = e.target?.result as string;
         dispatch({ type: 'LOAD_SRT', payload: { content, fileName: file.name } });
         dispatch({ type: 'SET_PROCESSING', payload: { isProcessing: false, progress: 100 } });
-        toast({ title: "Tải tệp lên thành công", description: `${file.name} đã được tải lên và xử lý.` });
+        toast({ variant: "success", title: "Tải tệp lên thành công", description: `${file.name} đã được tải lên và xử lý.` });
       };
       reader.onerror = () => {
         dispatch({ type: 'SET_PROCESSING', payload: { isProcessing: false, progress: 0 } });
@@ -59,7 +59,7 @@ export function AppHeader() {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      toast({ title: "Xuất tệp thành công", description: `Đã tải về ${newFileName}` });
+      toast({ variant: "success", title: "Xuất tệp thành công", description: `Đã tải về ${newFileName}` });
     } catch (error) {
       console.error("Export failed:", error);
       toast({ variant: "destructive", title: "Xuất tệp thất bại", description: "Đã có lỗi xảy ra. Vui lòng thử lại." });
