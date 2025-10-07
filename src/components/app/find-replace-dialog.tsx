@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { IconSearch, IconWand } from '@/components/icons';
+import { Search, Wand2 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 export function FindReplaceDialog() {
@@ -42,7 +42,7 @@ export function FindReplaceDialog() {
           <TooltipTrigger asChild>
              <DialogTrigger asChild>
                <Button variant="outline" size="icon" className="h-9 w-9">
-                  <IconSearch className="h-4 w-4" />
+                  <Search className="h-4 w-4" />
                 </Button>
             </DialogTrigger>
           </TooltipTrigger>
@@ -81,7 +81,7 @@ export function FindReplaceDialog() {
         <DialogFooter>
           <Button onClick={() => setIsOpen(false)} variant="outline">Hủy</Button>
           <Button onClick={handleReplaceAll} className="bg-primary text-primary-foreground">
-            <IconWand className="mr-2 h-4 w-4" />
+            <Wand2 className="mr-2 h-4 w-4" />
             Thay thế tất cả
           </Button>
         </DialogFooter>

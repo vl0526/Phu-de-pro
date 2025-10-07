@@ -15,7 +15,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { formatMsToTime } from '@/lib/srt-utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { IconSearch, IconChevronLeft, IconChevronRight, IconChevronsLeft, IconChevronsRight, IconUploadCloud, IconCombine, IconSplit, IconTrash } from '@/components/icons';
+import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, UploadCloud, Combine, Split, Trash2 } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
@@ -146,7 +146,7 @@ export function SubtitleTable() {
   if (subtitles.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center p-8 border-2 border-dashed rounded-lg bg-card">
-        <IconUploadCloud className="h-16 w-16 text-muted-foreground/50" />
+        <UploadCloud className="h-16 w-16 text-muted-foreground/50" />
         <h2 className="text-xl font-semibold mt-4 font-headline">Bắt đầu chỉnh sửa</h2>
         <p className="text-muted-foreground mt-2 max-w-sm">Tải lên tệp phụ đề .SRT của bạn để bắt đầu chỉnh sửa một cách chuyên nghiệp.</p>
       </div>
@@ -157,7 +157,7 @@ export function SubtitleTable() {
     <div className="flex flex-col h-full bg-card rounded-lg border">
       <div className="p-3 border-b flex items-center gap-2 flex-wrap">
         <div className="relative flex-grow min-w-[250px]">
-          <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Tìm kiếm STT, thời gian, nội dung..."
             value={localSearchTerm}
@@ -172,7 +172,7 @@ export function SubtitleTable() {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button variant="outline" size="icon" className="h-9 w-9" onClick={handleMerge} disabled={selectedCount < 2}>
-                    <IconCombine className="h-4 w-4" />
+                    <Combine className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -185,7 +185,7 @@ export function SubtitleTable() {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button variant="outline" size="icon" className="h-9 w-9" onClick={handleSplit} disabled={selectedCount !== 1}>
-                    <IconSplit className="h-4 w-4" />
+                    <Split className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -198,7 +198,7 @@ export function SubtitleTable() {
               <Tooltip>
                 <TooltipTrigger asChild>
                    <Button variant="destructive" size="sm" onClick={handleBatchDelete} disabled={selectedCount === 0} className="h-9">
-                    <IconTrash className="h-4 w-4 sm:mr-2" />
+                    <Trash2 className="h-4 w-4 sm:mr-2" />
                     <span className="hidden sm:inline">Xóa ({selectedCount})</span>
                   </Button>
                 </TooltipTrigger>
@@ -266,7 +266,7 @@ export function SubtitleTable() {
             disabled={validCurrentPage === 1}
             className="h-8 w-8"
           >
-            <IconChevronsLeft className="h-4 w-4" />
+            <ChevronsLeft className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
@@ -275,7 +275,7 @@ export function SubtitleTable() {
             disabled={validCurrentPage === 1}
             className="h-8 w-8"
           >
-            <IconChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4" />
           </Button>
           <span className="text-sm font-medium tabular-nums px-2">
             {validCurrentPage} / {totalPages}
@@ -287,7 +287,7 @@ export function SubtitleTable() {
             disabled={validCurrentPage === totalPages}
             className="h-8 w-8"
           >
-            <IconChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4" />
           </Button>
            <Button
             variant="outline"
@@ -296,7 +296,7 @@ export function SubtitleTable() {
             disabled={validCurrentPage === totalPages}
             className="h-8 w-8"
           >
-            <IconChevronsRight className="h-4 w-4" />
+            <ChevronsRight className="h-4 w-4" />
           </Button>
         </div>
       </div>
