@@ -4,6 +4,8 @@ export function AppLogo(props: SVGProps<SVGSVGElement>) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -12,10 +14,11 @@ export function AppLogo(props: SVGProps<SVGSVGElement>) {
             strokeLinejoin="round"
             {...props}
         >
-            <path d="M4 6h16" />
-            <path d="M4 12h16" />
-            <path d="M4 18h16" />
-            <path d="M9 3v18" />
+            <rect width="18" height="14" x="3" y="5" rx="2" ry="2" />
+            <path d="M7 15h4" />
+            <path d="M15 15h2" />
+            <path d="M7 11h2" />
+            <path d="M13 11h4" />
         </svg>
     )
 }
