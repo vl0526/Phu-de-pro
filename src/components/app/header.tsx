@@ -22,7 +22,7 @@ export function AppHeader() {
         const content = e.target?.result as string;
         dispatch({ type: 'LOAD_SRT', payload: { content, fileName: file.name } });
         dispatch({ type: 'SET_PROCESSING', payload: { isProcessing: false, progress: 100 } });
-        toast({ variant: "success", title: "Tải tệp lên thành công" });
+        toast({ variant: "success", title: "Tải lên thành công" });
       };
       reader.onerror = () => {
         dispatch({ type: 'SET_PROCESSING', payload: { isProcessing: false, progress: 0 } });
@@ -44,7 +44,7 @@ export function AppHeader() {
 
   const handleExport = () => {
     if (state.subtitles.length === 0) {
-      toast({ variant: "destructive", title: "Không có phụ đề để xuất" });
+      toast({ variant: "destructive", title: "Không có phụ đề" });
       return;
     }
     try {
@@ -75,6 +75,7 @@ export function AppHeader() {
       <div className="flex items-center gap-2">
         <input
           type="file"
+          id="file-upload-input"
           ref={fileInputRef}
           onChange={handleFileChange}
           accept=".srt"
@@ -84,7 +85,7 @@ export function AppHeader() {
           <Upload className="mr-2 h-4 w-4" />
           Tải lên
         </Button>
-        <Button onClick={handleExport} disabled={state.subtitles.length === 0} className="bg-accent hover:bg-accent/90 text-accent-foreground">
+        <Button onClick={handleExport} disabled={state.subtitles.length === 0} className="bg-primary text-primary-foreground hover:bg-primary/90">
           <Download className="mr-2 h-4 w-4" />
           Xuất file
         </Button>

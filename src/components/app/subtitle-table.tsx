@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { useSubtitleEditor } from '@/contexts/subtitle-editor-context';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { formatMsToTime } from '@/lib/srt-utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, FileText } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, UploadCloud } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 
 const ROWS_PER_PAGE = 100;
@@ -51,6 +51,7 @@ const EditableCell = ({ subId, initialText }: { subId: number, initialText: stri
 export function SubtitleTable() {
   const { state, dispatch } = useSubtitleEditor();
   const { subtitles, currentPage, searchTerm, selectedIds, isProMode } = state;
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
 
@@ -63,6 +64,14 @@ export function SubtitleTable() {
       clearTimeout(handler);
     };
   }, [localSearchTerm, dispatch]);
+
+  const handleUploadClick = () => {
+    // This seems to be a duplicate from header, but it's for the empty state button
+    const fileInput = document.getElementById('file-upload-input');
+    if (fileInput) {
+      fileInput.click();
+    }
+  };
 
   const filteredSubtitles = useMemo(() => {
     if (!searchTerm) return subtitles;
@@ -106,9 +115,13 @@ export function SubtitleTable() {
   if (subtitles.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center p-8 border-2 border-dashed rounded-lg bg-card m-6">
-        <FileText className="h-16 w-16 text-muted-foreground/50" />
-        <h2 className="text-xl font-semibold mt-4 font-headline">Trình chỉnh sửa trống</h2>
-        <p className="text-muted-foreground mt-2 max-w-sm">Tải lên tệp .SRT để bắt đầu. Kéo và thả hoặc nhấp vào nút 'Tải lên' ở trên cùng.</p>
+        <UploadCloud className="h-16 w-16 text-muted-foreground/50" />
+        <h2 className="text-xl font-semibold mt-4 font-headline">Bắt đầu chỉnh sửa</h2>
+        <p className="text-muted-foreground mt-2 max-w-sm">Tải lên tệp phụ đề .SRT của bạn để bắt đầu chỉnh sửa một cách chuyên nghiệp.</p>
+        <Button onClick={handleUploadClick} className="mt-6">
+          <UploadCloud className="mr-2 h-4 w-4" />
+          Tải lên tệp
+        </Button>
       </div>
     )
   }
