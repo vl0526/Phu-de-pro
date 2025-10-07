@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useSubtitleEditor } from '@/contexts/subtitle-editor-context';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Undo, Redo, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -18,12 +17,7 @@ const SPEED_PRESETS = [0.8, 0.9, 1.0, 1.2, 1.5, 2.0];
 export function Toolbar() {
   const { state, dispatch, history, currentIndex } = useSubtitleEditor();
   const { speed, selectedIds, isProMode } = state;
-  const [customSpeed, setCustomSpeed] = useState(speed.toString());
   const { toast } = useToast();
-
-  useEffect(() => {
-    setCustomSpeed(speed.toString());
-  }, [speed]);
 
   const handleSpeedChange = (newSpeed: number) => {
     if (isNaN(newSpeed) || newSpeed <= 0) {
@@ -32,10 +26,6 @@ export function Toolbar() {
     }
     dispatch({ type: 'CHANGE_SPEED', payload: newSpeed });
     toast({ title: `Đã áp dụng tốc độ ${newSpeed}x` });
-  };
-
-  const handleCustomSpeedApply = () => {
-    handleSpeedChange(parseFloat(customSpeed));
   };
   
   const handleBatchDelete = () => {
@@ -61,19 +51,6 @@ export function Toolbar() {
             {preset}x
           </Button>
         ))}
-      </div>
-
-      <div className="flex items-center gap-2">
-        <Input
-          type="number"
-          step="0.05"
-          value={customSpeed}
-          onChange={(e) => setCustomSpeed(e.target.value)}
-          onBlur={handleCustomSpeedApply}
-          onKeyDown={(e) => e.key === 'Enter' && handleCustomSpeedApply()}
-          className="h-9 w-24"
-          placeholder="Tùy chỉnh"
-        />
       </div>
       
       <div className="ml-auto flex items-center gap-2">
