@@ -22,7 +22,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { FindReplaceDialog } from './find-replace-dialog';
 
-
 const ROWS_PER_PAGE = 100;
 
 const EditableCell = ({ subId, initialText }: { subId: number, initialText: string }) => {
@@ -47,11 +46,10 @@ const EditableCell = ({ subId, initialText }: { subId: number, initialText: stri
             onChange={handleTextChange}
             onBlur={handleBlur}
             className="w-full bg-transparent border-none focus-visible:ring-1 focus-visible:ring-ring p-1 resize-none overflow-hidden h-auto leading-relaxed"
-            rows={text.split('\n').length}
+            rows={text.split('\n').length || 1}
         />
     );
 };
-
 
 export function SubtitleTable() {
   const { state, dispatch } = useSubtitleEditor();
@@ -154,7 +152,7 @@ export function SubtitleTable() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-card rounded-lg border">
+    <div className="h-full bg-card rounded-lg border flex flex-col">
       <div className="p-3 border-b flex items-center gap-2 flex-wrap">
         <div className="relative flex-grow min-w-[250px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
