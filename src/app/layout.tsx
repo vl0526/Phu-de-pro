@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'Phụ Đề Pro',
+  title: 'Best Max Deep Super Pro Web App',
   description: 'Chỉnh sửa file phụ đề SRT chuyên nghiệp',
 };
 
