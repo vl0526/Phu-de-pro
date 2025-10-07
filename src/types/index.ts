@@ -16,6 +16,7 @@ export interface EditorState {
   processingProgress: number;
   isProMode: boolean;
   fileName: string;
+  theme: 'light' | 'dark';
 }
 
 export type Action =
@@ -28,5 +29,9 @@ export type Action =
   | { type: 'BATCH_DELETE' }
   | { type: 'SET_PROCESSING'; payload: { isProcessing: boolean; progress: number } }
   | { type: 'UPDATE_SUBTITLE_TEXT'; payload: { id: number; text: string } }
+  | { type: 'BATCH_REPLACE'; payload: { find: string; replace: string } }
+  | { type: 'MERGE_SUBTITLES' }
+  | { type: 'SPLIT_SUBTITLE' }
+  | { type: 'TOGGLE_THEME' }
   | { type: 'UNDO' }
   | { type: 'REDO' };

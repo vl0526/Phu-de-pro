@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { Inter, Space_Grotesk } from 'next/font/google'
+import { ThemeProvider } from '@/contexts/theme-provider';
+import { SubtitleEditorProvider } from '@/contexts/subtitle-editor-context';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -27,8 +29,12 @@ export default function RootLayout({
   return (
     <html lang="vi" suppressHydrationWarning>
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-body antialiased`} suppressHydrationWarning>
-        {children}
-        <Toaster />
+        <SubtitleEditorProvider>
+          <ThemeProvider>
+            {children}
+          </ThemeProvider>
+          <Toaster />
+        </SubtitleEditorProvider>
       </body>
     </html>
   );

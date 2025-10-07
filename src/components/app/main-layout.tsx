@@ -7,7 +7,7 @@ import { useSubtitleEditor } from '@/contexts/subtitle-editor-context';
 import { useEffect } from 'react';
 
 export default function MainLayout() {
-  const { dispatch } = useSubtitleEditor();
+  const { state, dispatch } = useSubtitleEditor();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
