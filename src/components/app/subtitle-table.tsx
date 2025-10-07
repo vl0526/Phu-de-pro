@@ -20,6 +20,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
+import { FindReplaceDialog } from './find-replace-dialog';
 
 
 const ROWS_PER_PAGE = 100;
@@ -144,7 +145,7 @@ export function SubtitleTable() {
 
   if (subtitles.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-center p-8 border-2 border-dashed rounded-lg bg-card m-4 md:m-6">
+      <div className="flex flex-col items-center justify-center h-full text-center p-8 border-2 border-dashed rounded-lg bg-card">
         <UploadCloud className="h-16 w-16 text-muted-foreground/50" />
         <h2 className="text-xl font-semibold mt-4 font-headline">Bắt đầu chỉnh sửa</h2>
         <p className="text-muted-foreground mt-2 max-w-sm">Tải lên tệp phụ đề .SRT của bạn để bắt đầu chỉnh sửa một cách chuyên nghiệp.</p>
@@ -153,7 +154,7 @@ export function SubtitleTable() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-card rounded-lg border m-4 md:m-6">
+    <div className="flex flex-col h-full bg-card rounded-lg border">
       <div className="p-3 border-b flex items-center gap-2 flex-wrap">
         <div className="relative flex-grow min-w-[250px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -166,6 +167,7 @@ export function SubtitleTable() {
         </div>
         {isProMode && (
           <div className="flex items-center gap-2">
+            <FindReplaceDialog />
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
