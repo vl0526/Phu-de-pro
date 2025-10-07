@@ -27,7 +27,7 @@ import { Separator } from '@/components/ui/separator';
 const SPEED_PRESETS = [0.8, 0.9, 1.0, 1.2, 1.5, 2.0];
 
 function FindReplaceDialog() {
-  const { state, dispatch } = useSubtitleEditor();
+  const { dispatch } = useSubtitleEditor();
   const [findText, setFindText] = useState('');
   const [replaceText, setReplaceText] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -115,33 +115,6 @@ export function Toolbar() {
     toast({ title: `Đã áp dụng tốc độ ${newSpeed}x` });
   };
   
-  const handleBatchDelete = () => {
-    if (selectedIds.size === 0) {
-      toast({ variant: "destructive", title: "Chưa chọn mục nào" });
-      return;
-    }
-    dispatch({ type: 'BATCH_DELETE' });
-    toast({ title: `Đã xóa ${selectedIds.size} dòng` });
-  }
-
-  const handleMerge = () => {
-    if (selectedIds.size !== 2) {
-      toast({ variant: "destructive", title: "Cần chọn đúng 2 dòng để gộp" });
-      return;
-    }
-    dispatch({ type: 'MERGE_SUBTITLES' });
-    toast({ title: "Đã gộp 2 dòng thành công" });
-  };
-
-  const handleSplit = () => {
-    if (selectedIds.size !== 1) {
-      toast({ variant: "destructive", title: "Cần chọn 1 dòng để tách" });
-      return;
-    }
-    dispatch({ type: 'SPLIT_SUBTITLE' });
-     toast({ title: "Đã tách dòng thành công" });
-  };
-  
   const selectedCount = selectedIds.size;
 
   return (
@@ -164,47 +137,6 @@ export function Toolbar() {
          {isProMode && (
           <>
             <FindReplaceDialog />
-
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="outline" size="icon" className="h-9 w-9" onClick={handleMerge} disabled={selectedCount !== 2}>
-                    <Combine className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Gộp dòng (chọn 2)</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="outline" size="icon" className="h-9 w-9" onClick={handleSplit} disabled={selectedCount !== 1}>
-                    <Split className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Tách dòng (chọn 1)</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                   <Button variant="outline" size="sm" onClick={handleBatchDelete} disabled={selectedCount === 0} className="h-9">
-                    <Trash2 className="h-4 w-4 sm:mr-2" />
-                    <span className="hidden sm:inline">Xóa ({selectedCount})</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Xóa các dòng đã chọn</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            
             <Separator orientation="vertical" className="h-6" />
           </>
         )}

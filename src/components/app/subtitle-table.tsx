@@ -15,8 +15,12 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { formatMsToTime } from '@/lib/srt-utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, UploadCloud } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, UploadCloud, Combine, Split, Trash2 } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
+import { Separator } from '@/components/ui/separator';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useToast } from '@/hooks/use-toast';
+
 
 const ROWS_PER_PAGE = 100;
 
@@ -51,7 +55,7 @@ const EditableCell = ({ subId, initialText }: { subId: number, initialText: stri
 export function SubtitleTable() {
   const { state, dispatch } = useSubtitleEditor();
   const { subtitles, currentPage, searchTerm, selectedIds, isProMode } = state;
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
 
@@ -111,6 +115,35 @@ export function SubtitleTable() {
     [paginatedSubtitles, selectedIds]
   );
   
+  const handleBatchDelete = () => {
+    if (selectedIds.size === 0) {
+      toast({ variant: "destructive", title: "Chưa chọn mục nào" });
+      return;
+    }
+    dispatch({ type: 'BATCH_DELETE' });
+    toast({ title: `Đã xóa ${selectedIds.size} dòng` });
+  }
+
+  const handleMerge = () => {
+    if (selectedIds.size !== 2) {
+      toast({ variant: "destructive", title: "Cần chọn đúng 2 dòng để gộp" });
+      return;
+    }
+    dispatch({ type: 'MERGE_SUBTITLES' });
+    toast({ title: "Đã gộp 2 dòng thành công" });
+  };
+
+  const handleSplit = () => {
+    if (selectedIds.size !== 1) {
+      toast({ variant: "destructive", title: "Cần chọn 1 dòng để tách" });
+      return;
+    }
+    dispatch({ type: 'SPLIT_SUBTITLE' });
+     toast({ title: "Đã tách dòng thành công" });
+  };
+
+  const selectedCount = selectedIds.size;
+
   if (subtitles.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center p-8 border-2 border-dashed rounded-lg bg-card m-6">
@@ -123,8 +156,8 @@ export function SubtitleTable() {
 
   return (
     <div className="flex flex-col h-full bg-card rounded-lg border">
-      <div className="p-4 border-b">
-        <div className="relative">
+      <div className="p-4 border-b flex items-center gap-2 flex-wrap">
+        <div className="relative flex-grow">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Tìm kiếm theo STT, thời gian hoặc nội dung..."
@@ -133,6 +166,49 @@ export function SubtitleTable() {
             className="pl-10"
           />
         </div>
+        {isProMode && (
+          <div className="flex items-center gap-2">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="outline" size="icon" className="h-9 w-9" onClick={handleMerge} disabled={selectedCount !== 2}>
+                    <Combine className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Gộp dòng (chọn 2)</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="outline" size="icon" className="h-9 w-9" onClick={handleSplit} disabled={selectedCount !== 1}>
+                    <Split className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Tách dòng (chọn 1)</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                   <Button variant="outline" size="sm" onClick={handleBatchDelete} disabled={selectedCount === 0} className="h-9">
+                    <Trash2 className="h-4 w-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Xóa ({selectedCount})</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Xóa các dòng đã chọn</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        )}
       </div>
       <ScrollArea className="flex-grow">
         <Table>
