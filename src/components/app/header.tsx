@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useRef } from 'react';
-import { Upload, Download, Undo, Redo, Moon, Sun } from 'lucide-react';
 import { useSubtitleEditor } from '@/contexts/subtitle-editor-context';
 import { Button } from '@/components/ui/button';
-import { AppLogo } from '@/components/icons';
+import { AppLogo, IconUpload, IconDownload, IconUndo, IconRedo, IconMoon, IconSun } from '@/components/icons';
 import { stringifySrt } from '@/lib/srt-utils';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -87,7 +86,7 @@ export function AppHeader() {
                   onClick={() => dispatch({ type: 'UNDO' })}
                   disabled={currentIndex === 0}
                 >
-                  <Undo className="h-4 w-4" />
+                  <IconUndo className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -103,7 +102,7 @@ export function AppHeader() {
                   onClick={() => dispatch({ type: 'REDO' })}
                   disabled={currentIndex >= history.length - 1}
                  >
-                  <Redo className="h-4 w-4" />
+                  <IconRedo className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -121,8 +120,8 @@ export function AppHeader() {
                   className="h-8 w-8" 
                   onClick={() => dispatch({ type: 'TOGGLE_THEME' })}
                  >
-                  <Sun className="h-[1.1rem] w-[1.1rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                  <Moon className="absolute h-[1.1rem] w-[1.1rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                  <IconSun className="h-[1.1rem] w-[1.1rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                  <IconMoon className="absolute h-[1.1rem] w-[1.1rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -141,11 +140,11 @@ export function AppHeader() {
             className="hidden"
           />
           <Button variant="outline" size="sm" onClick={handleUploadClick}>
-            <Upload className="mr-2 h-4 w-4" />
+            <IconUpload className="mr-2 h-4 w-4" />
             Tải lên
           </Button>
           <Button onClick={handleExport} disabled={state.subtitles.length === 0} size="sm">
-            <Download className="mr-2 h-4 w-4" />
+            <IconDownload className="mr-2 h-4 w-4" />
             Xuất file
           </Button>
         </div>
