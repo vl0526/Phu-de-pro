@@ -37,7 +37,7 @@ export default function MainLayout() {
       <AppHeader />
       <main className="flex flex-1 flex-col">
         <Toolbar />
-        <div className="flex-1 overflow-auto p-4 md:p-6">
+        <div className="flex-1 overflow-auto">
           <SubtitleTable />
         </div>
       </main>

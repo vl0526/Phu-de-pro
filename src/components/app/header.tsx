@@ -72,7 +72,7 @@ export function AppHeader() {
         <AppLogo className="h-8 w-8 text-primary" />
         <h1 className="text-xl font-bold font-headline text-foreground">Sub Edit Pro</h1>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2">
         <input
           type="file"
           ref={fileInputRef}
@@ -84,7 +84,7 @@ export function AppHeader() {
           <Upload className="mr-2 h-4 w-4" />
           Tải lên
         </Button>
-        <Button onClick={handleExport} disabled={state.subtitles.length === 0}>
+        <Button onClick={handleExport} disabled={state.subtitles.length === 0} className="bg-accent hover:bg-accent/90 text-accent-foreground">
           <Download className="mr-2 h-4 w-4" />
           Xuất file
         </Button>

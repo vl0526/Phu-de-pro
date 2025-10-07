@@ -15,7 +15,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { formatMsToTime } from '@/lib/srt-utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, FileText } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 
 const ROWS_PER_PAGE = 100;
@@ -105,15 +105,16 @@ export function SubtitleTable() {
   
   if (subtitles.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-center p-8 border-2 border-dashed rounded-lg">
-        <h2 className="text-xl font-semibold">Bắt đầu bằng cách tải lên một tệp</h2>
-        <p className="text-muted-foreground mt-2">Chưa có phụ đề nào để hiển thị. Vui lòng tải lên một tệp .srt để bắt đầu chỉnh sửa.</p>
+      <div className="flex flex-col items-center justify-center h-full text-center p-8 border-2 border-dashed rounded-lg bg-card m-6">
+        <FileText className="h-16 w-16 text-muted-foreground/50" />
+        <h2 className="text-xl font-semibold mt-4 font-headline">Trình chỉnh sửa trống</h2>
+        <p className="text-muted-foreground mt-2 max-w-sm">Tải lên tệp .SRT để bắt đầu. Kéo và thả hoặc nhấp vào nút 'Tải lên' ở trên cùng.</p>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col h-full bg-card rounded-lg border">
+    <div className="flex flex-col h-full bg-card rounded-lg border m-6">
       <div className="p-4 border-b">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
