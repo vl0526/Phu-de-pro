@@ -118,10 +118,6 @@ export function SubtitleTable() {
         <UploadCloud className="h-16 w-16 text-muted-foreground/50" />
         <h2 className="text-xl font-semibold mt-4 font-headline">Bắt đầu chỉnh sửa</h2>
         <p className="text-muted-foreground mt-2 max-w-sm">Tải lên tệp phụ đề .SRT của bạn để bắt đầu chỉnh sửa một cách chuyên nghiệp.</p>
-        <Button onClick={handleUploadClick} className="mt-6">
-          <UploadCloud className="mr-2 h-4 w-4" />
-          Tải lên tệp
-        </Button>
       </div>
     )
   }
