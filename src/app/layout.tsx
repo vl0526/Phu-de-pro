@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'sUBTITLES Edit Pro',
+  title: 'Sub Edit Pro',
   description: 'Chỉnh sửa file phụ đề SRT chuyên nghiệp',
 };
 
