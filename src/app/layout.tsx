@@ -28,12 +28,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi" suppressHydrationWarning>
-      <body className={`${inter.variable} ${spaceGrotesk.variable} font-body antialiased`} suppressHydrationWarning>
+      <body className={`${inter.variable} ${spaceGrotesk.variable} font-body antialiased overflow-hidden`} suppressHydrationWarning>
         <SubtitleEditorProvider>
           <ThemeProvider>
             {children}
+            <Toaster />
           </ThemeProvider>
-          <Toaster />
         </SubtitleEditorProvider>
       </body>
     </html>
