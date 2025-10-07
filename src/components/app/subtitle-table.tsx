@@ -51,6 +51,7 @@ const EditableCell = ({ subId, initialText }: { subId: number, initialText: stri
 export function SubtitleTable() {
   const { state, dispatch } = useSubtitleEditor();
   const { subtitles, currentPage, searchTerm, selectedIds, isProMode } = state;
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
 
@@ -97,6 +98,13 @@ export function SubtitleTable() {
     const pageIds = paginatedSubtitles.map(sub => sub.id);
     dispatch({ type: 'TOGGLE_ALL_SELECTION', payload: { ids: pageIds, checked } });
   };
+  
+  const handleUploadClick = () => {
+    const uploadInput = document.getElementById('file-upload-input');
+    if (uploadInput) {
+        uploadInput.click();
+    }
+  };
 
   const isAllOnPageSelected = useMemo(() => 
     paginatedSubtitles.length > 0 && paginatedSubtitles.every(sub => selectedIds.has(sub.id)),
@@ -114,7 +122,7 @@ export function SubtitleTable() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-card rounded-lg border m-6">
+    <div className="flex flex-col h-full bg-card rounded-lg border">
       <div className="p-4 border-b">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -170,15 +178,16 @@ export function SubtitleTable() {
         </Table>
       </ScrollArea>
       <div className="flex items-center justify-between p-2 border-t">
-        <div className="text-sm text-muted-foreground">
+        <div className="text-sm text-muted-foreground px-2">
           Hiển thị {paginatedSubtitles.length} trên {filteredSubtitles.length} kết quả.
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Button
             variant="outline"
             size="icon"
             onClick={() => handlePageChange(1)}
             disabled={validCurrentPage === 1}
+            className="h-8 w-8"
           >
             <ChevronsLeft className="h-4 w-4" />
           </Button>
@@ -187,10 +196,11 @@ export function SubtitleTable() {
             size="icon"
             onClick={() => handlePageChange(validCurrentPage - 1)}
             disabled={validCurrentPage === 1}
+            className="h-8 w-8"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <span className="text-sm">
+          <span className="text-sm px-2">
             Trang {validCurrentPage} / {totalPages}
           </span>
           <Button
@@ -198,6 +208,7 @@ export function SubtitleTable() {
             size="icon"
             onClick={() => handlePageChange(validCurrentPage + 1)}
             disabled={validCurrentPage === totalPages}
+            className="h-8 w-8"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -206,6 +217,7 @@ export function SubtitleTable() {
             size="icon"
             onClick={() => handlePageChange(totalPages)}
             disabled={validCurrentPage === totalPages}
+            className="h-8 w-8"
           >
             <ChevronsRight className="h-4 w-4" />
           </Button>

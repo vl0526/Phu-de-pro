@@ -33,11 +33,11 @@ export default function MainLayout() {
   }, [dispatch]);
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-background">
+    <div className="flex h-screen w-full flex-col bg-background">
       <AppHeader />
-      <main className="flex flex-1 flex-col">
+      <main className="flex flex-1 flex-col overflow-hidden">
         <Toolbar />
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto p-4 md:p-6">
           <SubtitleTable />
         </div>
       </main>
