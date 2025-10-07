@@ -122,21 +122,6 @@ export function AppHeader() {
                   variant="outline" 
                   size="icon" 
                   className="h-8 w-8" 
-                 >
-                  <Settings className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Cài đặt (Sắp ra mắt)</p>
-              </TooltipContent>
-            </Tooltip>
-            
-            <Tooltip>
-              <TooltipTrigger asChild>
-                 <Button 
-                  variant="outline" 
-                  size="icon" 
-                  className="h-8 w-8" 
                   onClick={() => dispatch({ type: 'TOGGLE_THEME' })}
                  >
                   <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
