@@ -41,7 +41,7 @@ const EditableCell = ({ subId, initialText }: { subId: number, initialText: stri
             value={text}
             onChange={handleTextChange}
             onBlur={handleBlur}
-            className="w-full bg-transparent border-none focus-visible:ring-1 focus-visible:ring-ring p-0"
+            className="w-full bg-transparent border-none focus-visible:ring-1 focus-visible:ring-ring p-0 resize-none overflow-hidden"
             rows={text.split('\n').length}
         />
     );
