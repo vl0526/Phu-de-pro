@@ -51,7 +51,6 @@ const EditableCell = ({ subId, initialText }: { subId: number, initialText: stri
 export function SubtitleTable() {
   const { state, dispatch } = useSubtitleEditor();
   const { subtitles, currentPage, searchTerm, selectedIds, isProMode } = state;
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
 
@@ -64,14 +63,6 @@ export function SubtitleTable() {
       clearTimeout(handler);
     };
   }, [localSearchTerm, dispatch]);
-
-  const handleUploadClick = () => {
-    // This seems to be a duplicate from header, but it's for the empty state button
-    const fileInput = document.getElementById('file-upload-input');
-    if (fileInput) {
-      fileInput.click();
-    }
-  };
 
   const filteredSubtitles = useMemo(() => {
     if (!searchTerm) return subtitles;
@@ -178,7 +169,7 @@ export function SubtitleTable() {
           </TableBody>
         </Table>
       </ScrollArea>
-      <div className="flex items-center justify-between p-4 border-t">
+      <div className="flex items-center justify-between p-2 border-t">
         <div className="text-sm text-muted-foreground">
           Hiển thị {paginatedSubtitles.length} trên {filteredSubtitles.length} kết quả.
         </div>
