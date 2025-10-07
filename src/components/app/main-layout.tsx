@@ -33,7 +33,7 @@ export default function MainLayout() {
   }, [dispatch]);
 
   return (
-    <div className="flex h-screen w-full flex-col bg-background">
+    <div className="flex h-screen w-full flex-col bg-background" suppressHydrationWarning>
       <AppHeader />
       <main className="flex flex-1 flex-col overflow-hidden">
         <Toolbar />
