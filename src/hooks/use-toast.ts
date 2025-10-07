@@ -145,14 +145,17 @@ type Toast = Omit<ToasterToast, "id">
 
 // It's not possible to play audio here because this is not a hook,
 // so we'll pass the play function from the useToast hook.
-function toast(props: Toast, play: (sound: 'success' | 'error') => void) {
+function toast(props: Toast, play?: (sound: 'success' | 'error' | 'click') => void) {
   const id = genId()
 
-   if (props.variant === 'success') {
-    play('success');
-  } else if (props.variant === 'destructive') {
-    play('error');
-  }
+   if (play) {
+      if (props.variant === 'success') {
+        play('success');
+      } else if (props.variant === 'destructive') {
+        play('error');
+      }
+   }
+
 
   const update = (props: ToasterToast) =>
     dispatch({
@@ -184,7 +187,7 @@ function useToast() {
   const [state, setState] = React.useState<State>(memoryState)
   const { play } = useAudio();
 
-  const playSound = React.useCallback((sound: 'success' | 'error') => {
+  const playSound = React.useCallback((sound: 'success' | 'error' | 'click') => {
       play(sound);
   }, [play]);
 
