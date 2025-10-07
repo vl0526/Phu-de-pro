@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef } from 'react';
-import { Upload, Download, Undo, Redo, Moon, Sun, Search, Settings } from 'lucide-react';
+import { Upload, Download, Undo, Redo, Moon, Sun } from 'lucide-react';
 import { useSubtitleEditor } from '@/contexts/subtitle-editor-context';
 import { Button } from '@/components/ui/button';
 import { AppLogo } from '@/components/icons';
@@ -13,7 +13,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { FindReplaceDialog } from './find-replace-dialog';
 import { Separator } from '../ui/separator';
 
 export function AppHeader() {
@@ -73,9 +72,9 @@ export function AppHeader() {
   return (
     <TooltipProvider>
       <header className="flex h-14 items-center justify-between border-b bg-card px-4 md:px-6 sticky top-0 z-30">
-        <div className="flex items-center gap-3">
-          <AppLogo className="h-7 w-7 text-primary" />
-          <h1 className="text-lg font-bold font-headline text-foreground">Sub Edit Pro</h1>
+        <div className="flex items-center gap-2">
+          <AppLogo className="h-8 w-8" />
+          <h1 className="text-lg font-bold font-headline text-foreground tracking-tight">Sub Edit Pro</h1>
         </div>
         
         <div className="flex items-center gap-1.5">
@@ -114,8 +113,6 @@ export function AppHeader() {
 
             <Separator orientation="vertical" className="h-6 mx-1" />
             
-            {state.isProMode && <FindReplaceDialog />}
-            
              <Tooltip>
               <TooltipTrigger asChild>
                  <Button 
@@ -124,8 +121,8 @@ export function AppHeader() {
                   className="h-8 w-8" 
                   onClick={() => dispatch({ type: 'TOGGLE_THEME' })}
                  >
-                  <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                  <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                  <Sun className="h-[1.1rem] w-[1.1rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                  <Moon className="absolute h-[1.1rem] w-[1.1rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
