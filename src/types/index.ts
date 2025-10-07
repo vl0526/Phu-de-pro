@@ -1,12 +1,13 @@
 export interface Subtitle {
   id: number;
+  originalId: number; // To keep track of original subtitle after manipulations
   start: number; // in milliseconds
   end: number;   // in milliseconds
   text: string;
 }
 
 export interface EditorState {
-  originalSubtitles: Subtitle[];
+  originalSubtitles: Omit<Subtitle, 'originalId'>[];
   subtitles: Subtitle[];
   speed: number;
   searchTerm: string;

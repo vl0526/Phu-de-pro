@@ -1,38 +1,42 @@
 "use client";
 
 import React, { useRef } from 'react';
-import { Upload, Download } from 'lucide-react';
+import { Upload, Download, Undo, Redo, Moon, Sun, Search, Settings } from 'lucide-react';
 import { useSubtitleEditor } from '@/contexts/subtitle-editor-context';
 import { Button } from '@/components/ui/button';
 import { AppLogo } from '@/components/icons';
 import { stringifySrt } from '@/lib/srt-utils';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { FindReplaceDialog } from './find-replace-dialog';
+import { Separator } from '../ui/separator';
 
 export function AppHeader() {
-  const { state, dispatch } = useSubtitleEditor();
+  const { state, dispatch, history, currentIndex } = useSubtitleEditor();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && file.name.endsWith('.srt')) {
-      dispatch({ type: 'SET_PROCESSING', payload: { isProcessing: true, progress: 0 } });
       const reader = new FileReader();
       reader.onload = (e) => {
         const content = e.target?.result as string;
         dispatch({ type: 'LOAD_SRT', payload: { content, fileName: file.name } });
-        dispatch({ type: 'SET_PROCESSING', payload: { isProcessing: false, progress: 100 } });
-        toast({ variant: "success", title: "Tải lên thành công" });
+        toast({ variant: "success", title: `Đã tải lên tệp: ${file.name}` });
       };
       reader.onerror = () => {
-        dispatch({ type: 'SET_PROCESSING', payload: { isProcessing: false, progress: 0 } });
         toast({ variant: "destructive", title: "Không thể đọc tệp" });
       };
       reader.readAsText(file);
     } else {
-      toast({ variant: "destructive", title: "Tệp không hợp lệ" });
+      toast({ variant: "destructive", title: "Vui lòng chọn tệp .srt hợp lệ" });
     }
-    // Reset file input to allow uploading the same file again
     if(event.target) {
         event.target.value = '';
     }
@@ -44,7 +48,7 @@ export function AppHeader() {
 
   const handleExport = () => {
     if (state.subtitles.length === 0) {
-      toast({ variant: "destructive", title: "Không có phụ đề" });
+      toast({ variant: "destructive", title: "Không có phụ đề để xuất" });
       return;
     }
     try {
@@ -59,7 +63,7 @@ export function AppHeader() {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      toast({ variant: "success", title: "Xuất tệp thành công" });
+      toast({ variant: "success", title: "Xuất tệp thành công", description: `Đã lưu với tên: ${newFileName}` });
     } catch (error) {
       console.error("Export failed:", error);
       toast({ variant: "destructive", title: "Xuất tệp thất bại" });
@@ -67,29 +71,103 @@ export function AppHeader() {
   };
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-card px-4 md:px-6 sticky top-0 z-30">
-      <div className="flex items-center gap-3">
-        <AppLogo className="h-8 w-8 text-primary" />
-        <h1 className="text-xl font-bold font-headline text-foreground">Sub Edit Pro</h1>
-      </div>
-      <div className="flex items-center gap-2">
-        <input
-          type="file"
-          id="file-upload-input"
-          ref={fileInputRef}
-          onChange={handleFileChange}
-          accept=".srt"
-          className="hidden"
-        />
-        <Button variant="outline" onClick={handleUploadClick}>
-          <Upload className="mr-2 h-4 w-4" />
-          Tải lên
-        </Button>
-        <Button onClick={handleExport} disabled={state.subtitles.length === 0} className="bg-primary text-primary-foreground hover:bg-primary/90">
-          <Download className="mr-2 h-4 w-4" />
-          Xuất file
-        </Button>
-      </div>
-    </header>
+    <TooltipProvider>
+      <header className="flex h-14 items-center justify-between border-b bg-card px-4 md:px-6 sticky top-0 z-30">
+        <div className="flex items-center gap-3">
+          <AppLogo className="h-7 w-7 text-primary" />
+          <h1 className="text-lg font-bold font-headline text-foreground">Sub Edit Pro</h1>
+        </div>
+        
+        <div className="flex items-center gap-1.5">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="h-8 w-8" 
+                  onClick={() => dispatch({ type: 'UNDO' })}
+                  disabled={currentIndex === 0}
+                >
+                  <Undo className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Hoàn tác (Ctrl+Z)</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                 <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="h-8 w-8" 
+                  onClick={() => dispatch({ type: 'REDO' })}
+                  disabled={currentIndex >= history.length - 1}
+                 >
+                  <Redo className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Làm lại (Ctrl+Y)</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Separator orientation="vertical" className="h-6 mx-1" />
+            
+            {state.isProMode && <FindReplaceDialog />}
+            
+             <Tooltip>
+              <TooltipTrigger asChild>
+                 <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="h-8 w-8" 
+                 >
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Cài đặt (Sắp ra mắt)</p>
+              </TooltipContent>
+            </Tooltip>
+            
+            <Tooltip>
+              <TooltipTrigger asChild>
+                 <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="h-8 w-8" 
+                  onClick={() => dispatch({ type: 'TOGGLE_THEME' })}
+                 >
+                  <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                  <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Đổi giao diện</p>
+              </TooltipContent>
+            </Tooltip>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <input
+            type="file"
+            id="file-upload-input"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept=".srt"
+            className="hidden"
+          />
+          <Button variant="outline" size="sm" onClick={handleUploadClick}>
+            <Upload className="mr-2 h-4 w-4" />
+            Tải lên
+          </Button>
+          <Button onClick={handleExport} disabled={state.subtitles.length === 0} size="sm">
+            <Download className="mr-2 h-4 w-4" />
+            Xuất file
+          </Button>
+        </div>
+      </header>
+    </TooltipProvider>
   );
 }

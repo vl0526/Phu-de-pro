@@ -40,18 +40,23 @@ const reducer = (state: HistoryState, action: Action): HistoryState => {
   const currentEditorState = state.history[state.currentIndex];
 
   const updateHistory = (newEditorState: EditorState): HistoryState => {
-    // Only add to history if there's a meaningful change in subtitles or speed
-    const oldState = JSON.stringify({subtitles: currentEditorState.subtitles, speed: currentEditorState.speed});
-    const newState = JSON.stringify({subtitles: newEditorState.subtitles, speed: newEditorState.speed});
+    const oldSubs = JSON.stringify(currentEditorState.subtitles);
+    const newSubs = JSON.stringify(newEditorState.subtitles);
     
-    if (oldState === newState) {
-        return { ...state, history: state.history.map((s, i) => i === state.currentIndex ? newEditorState : s) };
+    if (oldSubs === newSubs && currentEditorState.speed === newEditorState.speed) {
+        // If only UI state changes, just update the current state without adding to history
+        const newHistory = [...state.history];
+        newHistory[state.currentIndex] = newEditorState;
+        return { ...state, history: newHistory };
     }
 
-    const newHistory = [...state.history.slice(0, state.currentIndex + 1), newEditorState];
+    const newHistorySlice = state.history.slice(0, state.currentIndex + 1);
+    const newHistory = [...newHistorySlice, newEditorState];
+    
     if (newHistory.length > MAX_HISTORY_LENGTH) {
       newHistory.shift();
     }
+
     return {
       history: newHistory,
       currentIndex: newHistory.length - 1,
@@ -76,6 +81,7 @@ const reducer = (state: HistoryState, action: Action): HistoryState => {
     }
     case 'CHANGE_SPEED': {
       const newSpeed = action.payload;
+      if (newSpeed === currentEditorState.speed) return state;
       const newSubtitles = currentEditorState.originalSubtitles.map(sub => ({
         ...sub,
         start: Math.round(sub.start / newSpeed),
@@ -86,20 +92,20 @@ const reducer = (state: HistoryState, action: Action): HistoryState => {
     case 'UPDATE_SUBTITLE_TEXT': {
         const { id, text } = action.payload;
         
-        let changed = false;
-        const newSubtitles = currentEditorState.subtitles.map(sub => {
-            if (sub.id === id && sub.text !== text) {
-                changed = true;
+        const subToUpdate = currentEditorState.subtitles.find(sub => sub.id === id);
+        if (!subToUpdate || subToUpdate.text === text) return state;
+
+        const newSubtitles = currentEditorState.subtitles.map(sub => 
+            sub.id === id ? { ...sub, text } : sub
+        );
+
+        const newOriginalSubtitles = currentEditorState.originalSubtitles.map((sub, index) => {
+            const currentSub = currentEditorState.subtitles[index];
+            if(currentSub.id === id) {
                 return { ...sub, text };
             }
             return sub;
         });
-
-        if (!changed) return state;
-
-        const newOriginalSubtitles = currentEditorState.originalSubtitles.map(sub =>
-            sub.id === id ? { ...sub, text } : sub
-        );
         
         return updateHistory({ 
             ...currentEditorState, 
@@ -107,12 +113,18 @@ const reducer = (state: HistoryState, action: Action): HistoryState => {
             originalSubtitles: newOriginalSubtitles
         });
     }
-    case 'SET_SEARCH_TERM':
-      // This is a UI-only state change, does not affect history
-      return { ...state, history: state.history.map((s, i) => i === state.currentIndex ? {...s, searchTerm: action.payload, currentPage: 1} : s) };
-    case 'CHANGE_PAGE':
-      // This is a UI-only state change, does not affect history
-      return { ...state, history: state.history.map((s, i) => i === state.currentIndex ? {...s, currentPage: action.payload} : s) };
+    case 'SET_SEARCH_TERM': {
+      const newEditorState = { ...currentEditorState, searchTerm: action.payload, currentPage: 1 };
+      const newHistory = [...state.history];
+      newHistory[state.currentIndex] = newEditorState;
+      return { ...state, history: newHistory };
+    }
+    case 'CHANGE_PAGE': {
+        const newEditorState = { ...currentEditorState, currentPage: action.payload };
+        const newHistory = [...state.history];
+        newHistory[state.currentIndex] = newEditorState;
+        return { ...state, history: newHistory };
+    }
     case 'TOGGLE_SELECTION': {
       const newSelectedIds = new Set(currentEditorState.selectedIds);
       if (newSelectedIds.has(action.payload)) {
@@ -120,7 +132,10 @@ const reducer = (state: HistoryState, action: Action): HistoryState => {
       } else {
         newSelectedIds.add(action.payload);
       }
-      return { ...state, history: state.history.map((s, i) => i === state.currentIndex ? {...s, selectedIds: newSelectedIds} : s) };
+      const newEditorState = { ...currentEditorState, selectedIds: newSelectedIds };
+      const newHistory = [...state.history];
+      newHistory[state.currentIndex] = newEditorState;
+      return { ...state, history: newHistory };
     }
     case 'TOGGLE_ALL_SELECTION': {
         const { ids, checked } = action.payload;
@@ -130,14 +145,26 @@ const reducer = (state: HistoryState, action: Action): HistoryState => {
         } else {
             ids.forEach(id => newSelectedIds.delete(id));
         }
-        return { ...state, history: state.history.map((s, i) => i === state.currentIndex ? {...s, selectedIds: newSelectedIds} : s) };
+        const newEditorState = { ...currentEditorState, selectedIds: newSelectedIds };
+        const newHistory = [...state.history];
+        newHistory[state.currentIndex] = newEditorState;
+        return { ...state, history: newHistory };
     }
     case 'BATCH_DELETE': {
-        const { selectedIds, subtitles, originalSubtitles } = currentEditorState;
+        const { selectedIds, subtitles } = currentEditorState;
         if (selectedIds.size === 0) return state;
-        
-        const newSubtitles = renumberSubtitles(subtitles.filter(sub => !selectedIds.has(sub.id)));
-        const newOriginalSubtitles = renumberSubtitles(originalSubtitles.filter(sub => !selectedIds.has(sub.id)));
+
+        const originalIdsToDelete = new Set<number>();
+        const subsToKeep = subtitles.filter(sub => {
+            if (selectedIds.has(sub.id)) {
+                originalIdsToDelete.add(sub.originalId);
+                return false;
+            }
+            return true;
+        });
+
+        const newSubtitles = renumberSubtitles(subsToKeep);
+        const newOriginalSubtitles = renumberSubtitles(currentEditorState.originalSubtitles.filter(sub => !originalIdsToDelete.has(sub.id)));
         
         return updateHistory({
             ...currentEditorState,
@@ -151,15 +178,25 @@ const reducer = (state: HistoryState, action: Action): HistoryState => {
         if (!find) return state;
 
         const findRegex = new RegExp(find.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g');
-        
-        const newSubtitles = currentEditorState.subtitles.map(sub => ({
-            ...sub,
-            text: sub.text.replace(findRegex, replace),
-        }));
-        const newOriginalSubtitles = currentEditorState.originalSubtitles.map(sub => ({
-            ...sub,
-            text: sub.text.replace(findRegex, replace),
-        }));
+        let changed = false;
+
+        const newSubtitles = currentEditorState.subtitles.map(sub => {
+            if(sub.text.includes(find)) {
+                changed = true;
+                return { ...sub, text: sub.text.replace(findRegex, replace) };
+            }
+            return sub;
+        });
+
+        if(!changed) return state;
+
+        const newOriginalSubtitles = currentEditorState.originalSubtitles.map((sub, index) => {
+            const currentSub = currentEditorState.subtitles[index];
+             if(currentSub.text.includes(find)) {
+                return { ...sub, text: sub.text.replace(findRegex, replace) };
+            }
+            return sub;
+        });
         
         return updateHistory({ 
             ...currentEditorState, 
@@ -168,25 +205,44 @@ const reducer = (state: HistoryState, action: Action): HistoryState => {
         });
     }
     case 'MERGE_SUBTITLES': {
-        const { selectedIds, subtitles, originalSubtitles } = currentEditorState;
-        if (selectedIds.size !== 2) return state;
+        const { selectedIds, subtitles } = currentEditorState;
+        if (selectedIds.size < 2) return state;
 
         const sortedSelected = subtitles
             .filter(sub => selectedIds.has(sub.id))
             .sort((a, b) => a.start - b.start);
         
-        const [first, second] = sortedSelected;
+        const first = sortedSelected[0];
+        const last = sortedSelected[sortedSelected.length - 1];
+
+        const mergedText = sortedSelected.map(s => s.text).join('\n');
 
         const mergedSub: Subtitle = {
             id: first.id,
+            originalId: first.originalId,
             start: first.start,
-            end: second.end,
-            text: `${first.text}\n${second.text}`
+            end: last.end,
+            text: mergedText
         };
 
-        const newSubtitles = renumberSubtitles(subtitles.filter(sub => !selectedIds.has(sub.id)).concat(mergedSub).sort((a,b) => a.start - b.start));
-        const newOriginalSubtitles = renumberSubtitles(originalSubtitles.filter(sub => !selectedIds.has(sub.id)).concat(mergedSub).sort((a,b) => a.start - b.start));
+        const originalIdsToDelete = new Set(sortedSelected.map(s => s.originalId));
+        originalIdsToDelete.delete(first.originalId);
 
+        const otherSubs = subtitles.filter(sub => !selectedIds.has(sub.id));
+        const newSubtitles = renumberSubtitles([...otherSubs, mergedSub].sort((a,b) => a.start - b.start));
+        
+        const newOriginalSubtitles = renumberSubtitles(currentEditorState.originalSubtitles.filter(sub => !originalIdsToDelete.has(sub.id)).map(sub => {
+          if (sub.id === first.originalId) {
+            return {
+              id: sub.id,
+              start: first.start,
+              end: last.end,
+              text: mergedText
+            };
+          }
+          return sub;
+        }));
+        
         return updateHistory({
             ...currentEditorState,
             subtitles: newSubtitles,
@@ -195,18 +251,24 @@ const reducer = (state: HistoryState, action: Action): HistoryState => {
         });
     }
     case 'SPLIT_SUBTITLE': {
-        const { selectedIds, subtitles, originalSubtitles } = currentEditorState;
+        const { selectedIds, subtitles } = currentEditorState;
         if (selectedIds.size !== 1) return state;
 
         const subToSplit = subtitles.find(sub => selectedIds.has(sub.id));
         if (!subToSplit || !subToSplit.text.includes('\n')) return state;
+        
+        const originalSubToSplit = currentEditorState.originalSubtitles.find(osub => osub.id === subToSplit.originalId);
+        if(!originalSubToSplit) return state;
 
-        const parts = subToSplit.text.split('\n');
-        const midpointTime = subToSplit.start + Math.round((subToSplit.end - subToSplit.start) / 2);
+        const parts = subToSplit.text.split('\n').filter(p => p.trim() !== '');
+        if (parts.length < 2) return state;
+
+        const duration = subToSplit.end - subToSplit.start;
+        const midpointTime = subToSplit.start + Math.round(duration / parts.length);
 
         const firstPart: Subtitle = {
             ...subToSplit,
-            text: parts.slice(0, 1).join('\n'),
+            text: parts[0],
             end: midpointTime,
         };
         const secondPart: Subtitle = {
@@ -217,7 +279,20 @@ const reducer = (state: HistoryState, action: Action): HistoryState => {
 
         const otherSubs = subtitles.filter(sub => sub.id !== subToSplit.id);
         const newSubtitles = renumberSubtitles([...otherSubs, firstPart, secondPart].sort((a, b) => a.start - b.start));
-        const newOriginalSubtitles = renumberSubtitles([...originalSubtitles.filter(sub => sub.id !== subToSplit.id), firstPart, secondPart].sort((a,b)=>a.start-b.start));
+        
+        const newOriginalSubtitles = renumberSubtitles(
+            currentEditorState.originalSubtitles.map(osub => {
+                if (osub.id === subToSplit.originalId) {
+                    return { ...osub, text: firstPart.text, end: midpointTime };
+                }
+                return osub;
+            }).concat([{
+                id: Math.max(...currentEditorState.originalSubtitles.map(s => s.id)) + 1,
+                start: midpointTime,
+                end: originalSubToSplit.end,
+                text: secondPart.text,
+            }]).sort((a, b) => a.start - b.start)
+        );
 
         return updateHistory({
             ...currentEditorState,
@@ -227,13 +302,12 @@ const reducer = (state: HistoryState, action: Action): HistoryState => {
         });
     }
 
-    case 'SET_PROCESSING':
-      // This is a UI-only state change, does not affect history
-      return { ...state, history: state.history.map((s, i) => i === state.currentIndex ? {...s, isProcessing: action.payload.isProcessing, processingProgress: action.payload.progress} : s) };
-    
     case 'TOGGLE_THEME': {
       const newTheme = currentEditorState.theme === 'light' ? 'dark' : 'light';
-      return { ...state, history: state.history.map((s, i) => i === state.currentIndex ? {...s, theme: newTheme} : s) };
+      const newEditorState = { ...currentEditorState, theme: newTheme };
+      const newHistory = [...state.history];
+      newHistory[state.currentIndex] = newEditorState;
+      return { ...state, history: newHistory };
     }
 
     case 'UNDO': {

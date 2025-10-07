@@ -1,7 +1,7 @@
 import type { Subtitle } from '@/types';
 
 function timeToMs(time: string): number {
-  const parts = time.match(/(\d{2}):(\d{2}):(\d{2}),(\d{3})/);
+  const parts = time.replace(',', '.').match(/(\d{2}):(\d{2}):(\d{2})\.(\d{3})/);
   if (!parts) return 0;
   const [, hours, minutes, seconds, milliseconds] = parts;
   return (
@@ -23,14 +23,32 @@ export function formatMsToTime(ms: number): string {
 
 export function parseSrt(content: string): Subtitle[] {
   const subtitles: Subtitle[] = [];
-  const blocks = content.trim().split(/\r?\n\r?\n/);
+  const blocks = content.trim().replace(/\r/g, '').split(/\n\n/);
 
   for (const block of blocks) {
-    const lines = block.split(/\r?\n/);
-    if (lines.length >= 3) {
+    const lines = block.split('\n');
+    if (lines.length >= 2) {
       try {
         const id = parseInt(lines[0], 10);
-        const timeMatch = lines[1].match(/(\d{2}:\d{2}:\d{2},\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2},\d{3})/);
+        if (isNaN(id)) {
+            // Some SRT files don't have IDs, so we can try parsing from the timecode line
+            const timeMatchFirstLine = lines[0].match(/(\d{2}:\d{2}:\d{2}[,.]\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}[,.]\d{3})/);
+            if (timeMatchFirstLine) {
+                const newId = subtitles.length + 1;
+                const [, startTime, endTime] = timeMatchFirstLine;
+                const text = lines.slice(1).join('\n');
+                 subtitles.push({
+                  id: newId,
+                  originalId: newId,
+                  start: timeToMs(startTime),
+                  end: timeToMs(endTime),
+                  text,
+                });
+            }
+            continue;
+        };
+
+        const timeMatch = lines[1].match(/(\d{2}:\d{2}:\d{2}[,.]\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}[,.]\d{3})/);
         if (!timeMatch) continue;
 
         const [, startTime, endTime] = timeMatch;
@@ -38,6 +56,7 @@ export function parseSrt(content: string): Subtitle[] {
 
         subtitles.push({
           id,
+          originalId: id,
           start: timeToMs(startTime),
           end: timeToMs(endTime),
           text,

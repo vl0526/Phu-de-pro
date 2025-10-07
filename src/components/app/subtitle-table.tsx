@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useSubtitleEditor } from '@/contexts/subtitle-editor-context';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -17,9 +17,9 @@ import { formatMsToTime } from '@/lib/srt-utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, UploadCloud, Combine, Split, Trash2 } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
-import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
 
 
 const ROWS_PER_PAGE = 100;
@@ -45,7 +45,7 @@ const EditableCell = ({ subId, initialText }: { subId: number, initialText: stri
             value={text}
             onChange={handleTextChange}
             onBlur={handleBlur}
-            className="w-full bg-transparent border-none focus-visible:ring-1 focus-visible:ring-ring p-0 resize-none overflow-hidden"
+            className="w-full bg-transparent border-none focus-visible:ring-1 focus-visible:ring-ring p-1 resize-none overflow-hidden h-auto leading-relaxed"
             rows={text.split('\n').length}
         />
     );
@@ -103,13 +103,6 @@ export function SubtitleTable() {
     dispatch({ type: 'TOGGLE_ALL_SELECTION', payload: { ids: pageIds, checked } });
   };
   
-  const handleUploadClick = () => {
-    const uploadInput = document.getElementById('file-upload-input');
-    if (uploadInput) {
-        uploadInput.click();
-    }
-  };
-
   const isAllOnPageSelected = useMemo(() => 
     paginatedSubtitles.length > 0 && paginatedSubtitles.every(sub => selectedIds.has(sub.id)),
     [paginatedSubtitles, selectedIds]
@@ -121,32 +114,37 @@ export function SubtitleTable() {
       return;
     }
     dispatch({ type: 'BATCH_DELETE' });
-    toast({ title: `Đã xóa ${selectedIds.size} dòng` });
+    toast({ variant: "success", title: `Đã xóa ${selectedIds.size} dòng` });
   }
 
   const handleMerge = () => {
-    if (selectedIds.size !== 2) {
-      toast({ variant: "destructive", title: "Cần chọn đúng 2 dòng để gộp" });
+    if (selectedIds.size < 2) {
+      toast({ variant: "destructive", title: "Cần chọn ít nhất 2 dòng để gộp" });
       return;
     }
     dispatch({ type: 'MERGE_SUBTITLES' });
-    toast({ title: "Đã gộp 2 dòng thành công" });
+    toast({ variant: "success", title: `Đã gộp ${selectedIds.size} dòng thành công` });
   };
 
   const handleSplit = () => {
     if (selectedIds.size !== 1) {
-      toast({ variant: "destructive", title: "Cần chọn 1 dòng để tách" });
+      toast({ variant: "destructive", title: "Cần chọn đúng 1 dòng để tách" });
       return;
     }
+    const subToSplit = subtitles.find(sub => selectedIds.has(sub.id));
+    if (subToSplit && !subToSplit.text.includes('\n')) {
+        toast({ variant: "destructive", title: "Dòng này không thể tách", description: "Nội dung phải chứa ký tự xuống dòng." });
+        return;
+    }
     dispatch({ type: 'SPLIT_SUBTITLE' });
-     toast({ title: "Đã tách dòng thành công" });
+     toast({ variant: "success", title: "Đã tách dòng thành công" });
   };
 
   const selectedCount = selectedIds.size;
 
   if (subtitles.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-center p-8 border-2 border-dashed rounded-lg bg-card m-6">
+      <div className="flex flex-col items-center justify-center h-full text-center p-8 border-2 border-dashed rounded-lg bg-card m-4 md:m-6">
         <UploadCloud className="h-16 w-16 text-muted-foreground/50" />
         <h2 className="text-xl font-semibold mt-4 font-headline">Bắt đầu chỉnh sửa</h2>
         <p className="text-muted-foreground mt-2 max-w-sm">Tải lên tệp phụ đề .SRT của bạn để bắt đầu chỉnh sửa một cách chuyên nghiệp.</p>
@@ -155,15 +153,15 @@ export function SubtitleTable() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-card rounded-lg border">
-      <div className="p-4 border-b flex items-center gap-2 flex-wrap">
-        <div className="relative flex-grow">
+    <div className="flex flex-col h-full bg-card rounded-lg border m-4 md:m-6">
+      <div className="p-3 border-b flex items-center gap-2 flex-wrap">
+        <div className="relative flex-grow min-w-[250px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Tìm kiếm theo STT, thời gian hoặc nội dung..."
+            placeholder="Tìm kiếm STT, thời gian, nội dung..."
             value={localSearchTerm}
             onChange={(e) => setLocalSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 h-9"
           />
         </div>
         {isProMode && (
@@ -171,12 +169,12 @@ export function SubtitleTable() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" size="icon" className="h-9 w-9" onClick={handleMerge} disabled={selectedCount !== 2}>
+                  <Button variant="outline" size="icon" className="h-9 w-9" onClick={handleMerge} disabled={selectedCount < 2}>
                     <Combine className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Gộp dòng (chọn 2)</p>
+                  <p>Gộp dòng (chọn {'>'}= 2)</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -197,7 +195,7 @@ export function SubtitleTable() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                   <Button variant="outline" size="sm" onClick={handleBatchDelete} disabled={selectedCount === 0} className="h-9">
+                   <Button variant="destructive" size="sm" onClick={handleBatchDelete} disabled={selectedCount === 0} className="h-9">
                     <Trash2 className="h-4 w-4 sm:mr-2" />
                     <span className="hidden sm:inline">Xóa ({selectedCount})</span>
                   </Button>
@@ -215,34 +213,34 @@ export function SubtitleTable() {
           <TableHeader className="sticky top-0 bg-card z-10">
             <TableRow>
               {isProMode && (
-                <TableHead className="w-[50px]">
+                <TableHead className="w-[50px] px-3">
                   <Checkbox 
                     checked={isAllOnPageSelected}
                     onCheckedChange={(checked) => handleSelectAll(Boolean(checked))}
                   />
                 </TableHead>
               )}
-              <TableHead className="w-[80px]">STT</TableHead>
-              <TableHead className="w-[240px]">Thời gian</TableHead>
-              <TableHead>Nội dung</TableHead>
+              <TableHead className="w-[80px] px-3">STT</TableHead>
+              <TableHead className="w-[220px] px-3">Thời gian</TableHead>
+              <TableHead className="px-3">Nội dung</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedSubtitles.map(sub => (
               <TableRow key={sub.id} data-state={selectedIds.has(sub.id) ? 'selected' : ''}>
                 {isProMode && (
-                  <TableCell>
+                  <TableCell className="px-3">
                     <Checkbox
                       checked={selectedIds.has(sub.id)}
                       onCheckedChange={() => dispatch({ type: 'TOGGLE_SELECTION', payload: sub.id })}
                     />
                   </TableCell>
                 )}
-                <TableCell className="font-medium">{sub.id}</TableCell>
-                <TableCell className="font-mono text-sm tracking-wider">
+                <TableCell className="font-medium px-3 text-muted-foreground">{sub.id}</TableCell>
+                <TableCell className="font-mono text-xs tracking-wider px-3">
                   {`${formatMsToTime(sub.start)} → ${formatMsToTime(sub.end)}`}
                 </TableCell>
-                <TableCell className="whitespace-pre-wrap">
+                <TableCell className="whitespace-pre-wrap px-3 py-1">
                   <EditableCell subId={sub.id} initialText={sub.text} />
                 </TableCell>
               </TableRow>
@@ -252,7 +250,11 @@ export function SubtitleTable() {
       </ScrollArea>
       <div className="flex items-center justify-between p-2 border-t">
         <div className="text-sm text-muted-foreground px-2">
-          Hiển thị {paginatedSubtitles.length} trên {filteredSubtitles.length} kết quả.
+          {selectedCount > 0 ? (
+            <Badge variant="secondary">{selectedCount} dòng đã chọn</Badge>
+          ) : (
+            `Hiển thị ${paginatedSubtitles.length} / ${filteredSubtitles.length} kết quả`
+          )}
         </div>
         <div className="flex items-center gap-1">
           <Button
@@ -273,8 +275,8 @@ export function SubtitleTable() {
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <span className="text-sm px-2">
-            Trang {validCurrentPage} / {totalPages}
+          <span className="text-sm font-medium tabular-nums px-2">
+            {validCurrentPage} / {totalPages}
           </span>
           <Button
             variant="outline"
