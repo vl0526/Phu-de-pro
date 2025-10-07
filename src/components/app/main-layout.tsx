@@ -3,7 +3,6 @@
 import { AppHeader } from '@/components/app/header';
 import { Toolbar } from '@/components/app/toolbar';
 import { SubtitleTable } from '@/components/app/subtitle-table';
-import { StatusBar } from '@/components/app/status-bar';
 import { useSubtitleEditor } from '@/contexts/subtitle-editor-context';
 import { useEffect } from 'react';
 
@@ -42,7 +41,6 @@ export default function MainLayout() {
           <SubtitleTable />
         </div>
       </main>
-      <StatusBar />
     </div>
   );
 }
