@@ -7,7 +7,7 @@ import { useSubtitleEditor } from '@/contexts/subtitle-editor-context';
 import { useEffect } from 'react';
 
 export default function MainLayout() {
-  const { state, dispatch } = useSubtitleEditor();
+  const { dispatch } = useSubtitleEditor();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -37,8 +37,10 @@ export default function MainLayout() {
       <AppHeader />
       <main className="flex flex-1 flex-col overflow-hidden">
         <Toolbar />
-        <div className="flex-1 overflow-auto p-4 md:p-6">
-          <SubtitleTable />
+        <div className="flex-1 overflow-auto">
+          <div className="h-full w-full">
+             <SubtitleTable />
+          </div>
         </div>
       </main>
     </div>
