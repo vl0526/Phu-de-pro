@@ -21,6 +21,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { FindReplaceDialog } from './find-replace-dialog';
+import { useAudio } from '@/contexts/audio-provider';
 
 const ROWS_PER_PAGE = 100;
 
@@ -55,6 +56,7 @@ export function SubtitleTable() {
   const { state, dispatch } = useSubtitleEditor();
   const { subtitles, currentPage, searchTerm, selectedIds, isProMode } = state;
   const { toast } = useToast();
+  const { play } = useAudio();
 
   const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
 
@@ -94,13 +96,20 @@ export function SubtitleTable() {
   }, [filteredSubtitles, validCurrentPage]);
 
   const handlePageChange = (newPage: number) => {
+    play('click');
     dispatch({ type: 'CHANGE_PAGE', payload: newPage });
   };
 
   const handleSelectAll = (checked: boolean) => {
+    play('click');
     const pageIds = paginatedSubtitles.map(sub => sub.id);
     dispatch({ type: 'TOGGLE_ALL_SELECTION', payload: { ids: pageIds, checked } });
   };
+
+  const handleToggleSelection = (id: number) => {
+    play('click');
+    dispatch({ type: 'TOGGLE_SELECTION', payload: id });
+  }
   
   const isAllOnPageSelected = useMemo(() => 
     paginatedSubtitles.length > 0 && paginatedSubtitles.every(sub => selectedIds.has(sub.id)),
@@ -108,6 +117,7 @@ export function SubtitleTable() {
   );
   
   const handleBatchDelete = () => {
+    play('click');
     if (selectedIds.size === 0) {
       toast({ variant: "destructive", title: "Chưa chọn mục nào" });
       return;
@@ -117,6 +127,7 @@ export function SubtitleTable() {
   }
 
   const handleMerge = () => {
+    play('click');
     if (selectedIds.size < 2) {
       toast({ variant: "destructive", title: "Cần chọn ít nhất 2 dòng để gộp" });
       return;
@@ -126,6 +137,7 @@ export function SubtitleTable() {
   };
 
   const handleSplit = () => {
+    play('click');
     if (selectedIds.size !== 1) {
       toast({ variant: "destructive", title: "Cần chọn đúng 1 dòng để tách" });
       return;
@@ -143,7 +155,7 @@ export function SubtitleTable() {
 
   if (subtitles.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-center p-8 border-2 border-dashed rounded-lg bg-card">
+      <div className="flex flex-col items-center justify-center h-full text-center p-8 border-2 border-dashed rounded-lg bg-card" suppressHydrationWarning>
         <UploadCloud className="h-16 w-16 text-muted-foreground/50" />
         <h2 className="text-xl font-semibold mt-4 font-headline">Bắt đầu chỉnh sửa</h2>
         <p className="text-muted-foreground mt-2 max-w-sm">Tải lên tệp phụ đề .SRT của bạn để bắt đầu chỉnh sửa một cách chuyên nghiệp.</p>
@@ -152,7 +164,7 @@ export function SubtitleTable() {
   }
 
   return (
-    <div className="h-full bg-card rounded-lg border flex flex-col">
+    <div className="h-full bg-card rounded-lg border flex flex-col" suppressHydrationWarning>
       <div className="p-3 border-b flex items-center gap-2 flex-wrap">
         <div className="relative flex-grow min-w-[250px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -232,7 +244,7 @@ export function SubtitleTable() {
                   <TableCell className="px-3">
                     <Checkbox
                       checked={selectedIds.has(sub.id)}
-                      onCheckedChange={() => dispatch({ type: 'TOGGLE_SELECTION', payload: sub.id })}
+                      onCheckedChange={() => handleToggleSelection(sub.id)}
                     />
                   </TableCell>
                 )}

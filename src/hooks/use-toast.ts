@@ -7,9 +7,10 @@ import type {
   ToastActionElement,
   ToastProps,
 } from "@/components/ui/toast"
+import { useAudio } from "@/contexts/audio-provider"
 
 const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 1000000
+const TOAST_REMOVE_DELAY = 5000 // 5 seconds
 
 type ToasterToast = ToastProps & {
   id: string
@@ -142,8 +143,16 @@ function dispatch(action: Action) {
 
 type Toast = Omit<ToasterToast, "id">
 
-function toast({ ...props }: Toast) {
+// It's not possible to play audio here because this is not a hook,
+// so we'll pass the play function from the useToast hook.
+function toast(props: Toast, play: (sound: 'success' | 'error') => void) {
   const id = genId()
+
+   if (props.variant === 'success') {
+    play('success');
+  } else if (props.variant === 'destructive') {
+    play('error');
+  }
 
   const update = (props: ToasterToast) =>
     dispatch({
@@ -173,6 +182,11 @@ function toast({ ...props }: Toast) {
 
 function useToast() {
   const [state, setState] = React.useState<State>(memoryState)
+  const { play } = useAudio();
+
+  const playSound = React.useCallback((sound: 'success' | 'error') => {
+      play(sound);
+  }, [play]);
 
   React.useEffect(() => {
     listeners.push(setState)
@@ -186,7 +200,7 @@ function useToast() {
 
   return {
     ...state,
-    toast,
+    toast: (props: Toast) => toast(props, playSound),
     dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
   }
 }

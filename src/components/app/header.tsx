@@ -14,11 +14,13 @@ import {
 } from "@/components/ui/tooltip"
 import { Separator } from '../ui/separator';
 import { Upload, Download, Undo2, Redo2, Moon, Sun } from 'lucide-react';
+import { useAudio } from '@/contexts/audio-provider';
 
 export function AppHeader() {
   const { state, dispatch, history, currentIndex } = useSubtitleEditor();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { play } = useAudio();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -42,10 +44,12 @@ export function AppHeader() {
   };
 
   const handleUploadClick = () => {
+    play('click');
     fileInputRef.current?.click();
   };
 
   const handleExport = () => {
+    play('click');
     if (state.subtitles.length === 0) {
       toast({ variant: "destructive", title: "Không có phụ đề để xuất" });
       return;
@@ -69,22 +73,37 @@ export function AppHeader() {
     }
   };
 
+  const handleUndo = () => {
+    play('click');
+    dispatch({ type: 'UNDO' });
+  }
+
+  const handleRedo = () => {
+    play('click');
+    dispatch({ type: 'REDO' });
+  }
+  
+  const handleToggleTheme = () => {
+    play('click');
+    dispatch({ type: 'TOGGLE_THEME' });
+  }
+
   return (
     <TooltipProvider>
-      <header className="flex h-14 items-center justify-between border-b bg-card px-4 md:px-6 sticky top-0 z-30">
-        <div className="flex items-center gap-2">
+      <header className="flex h-14 items-center justify-between border-b bg-card px-4 md:px-6 sticky top-0 z-30" suppressHydrationWarning>
+        <div className="flex items-center gap-2" suppressHydrationWarning>
           <AppLogo className="h-8 w-8" />
           <h1 className="text-lg font-bold font-headline text-foreground tracking-tight">Sub Edit Pro</h1>
         </div>
         
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5" suppressHydrationWarning>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button 
                   variant="outline" 
                   size="icon" 
                   className="h-9 w-9" 
-                  onClick={() => dispatch({ type: 'UNDO' })}
+                  onClick={handleUndo}
                   disabled={currentIndex === 0}
                 >
                   <Undo2 className="h-4 w-4" />
@@ -100,7 +119,7 @@ export function AppHeader() {
                   variant="outline" 
                   size="icon" 
                   className="h-9 w-9" 
-                  onClick={() => dispatch({ type: 'REDO' })}
+                  onClick={handleRedo}
                   disabled={currentIndex >= history.length - 1}
                  >
                   <Redo2 className="h-4 w-4" />
@@ -111,7 +130,7 @@ export function AppHeader() {
               </TooltipContent>
             </Tooltip>
 
-            <Separator orientation="vertical" className="h-6 mx-1" />
+            <Separator orientation="vertical" className="h-6 mx-1" suppressHydrationWarning />
             
              <Tooltip>
               <TooltipTrigger asChild>
@@ -119,7 +138,7 @@ export function AppHeader() {
                   variant="outline" 
                   size="icon" 
                   className="h-9 w-9" 
-                  onClick={() => dispatch({ type: 'TOGGLE_THEME' })}
+                  onClick={handleToggleTheme}
                  >
                   <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
                   <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
@@ -131,7 +150,7 @@ export function AppHeader() {
             </Tooltip>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2" suppressHydrationWarning>
           <input
             type="file"
             id="file-upload-input"

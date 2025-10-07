@@ -9,14 +9,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { useAudio } from '@/contexts/audio-provider';
 
 const SPEED_PRESETS = [0.8, 0.9, 1.0, 1.2, 1.5, 2.0];
 
 export function Toolbar() {
   const { state, dispatch } = useSubtitleEditor();
   const { speed, subtitles } = state;
+  const { play } = useAudio();
 
   const handleSpeedChange = (newSpeed: number) => {
+    play('click');
     dispatch({ type: 'CHANGE_SPEED', payload: newSpeed });
   };
   

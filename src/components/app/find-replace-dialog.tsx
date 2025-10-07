@@ -7,7 +7,6 @@ import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -17,31 +16,45 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Search, Wand2 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+import { useAudio } from '@/contexts/audio-provider';
 
 export function FindReplaceDialog() {
   const { dispatch } = useSubtitleEditor();
+  const { play } = useAudio();
   const [findText, setFindText] = useState('');
   const [replaceText, setReplaceText] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const [isShaking, setIsShaking] = useState(false);
   const { toast } = useToast();
 
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (!open) {
+      setFindText('');
+      setReplaceText('');
+    }
+  }
+
   const handleReplaceAll = () => {
+    play('click');
     if (!findText) {
       toast({ variant: "destructive", title: "Chưa nhập nội dung cần tìm" });
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 500);
       return;
     }
     dispatch({ type: 'BATCH_REPLACE', payload: { find: findText, replace: replaceText } });
     toast({ variant: "success", title: "Đã thay thế xong" });
-    setIsOpen(false);
+    handleOpenChange(false);
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
              <DialogTrigger asChild>
-               <Button variant="outline" size="icon" className="h-9 w-9">
+               <Button variant="outline" size="icon" className="h-9 w-9" onClick={() => play('click')}>
                   <Search className="h-4 w-4" />
                 </Button>
             </DialogTrigger>
@@ -51,14 +64,14 @@ export function FindReplaceDialog() {
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent 
+        className={`sm:max-w-md ${isShaking ? 'animate-shake' : ''}`}
+        onAnimationEnd={() => setIsShaking(false)}
+      >
         <DialogHeader>
           <DialogTitle>Tìm & Thay thế</DialogTitle>
-          <DialogDescription>
-            Tìm và thay thế hàng loạt nội dung trong tất cả phụ đề.
-          </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-6 py-4">
+        <div className="grid gap-4 py-4">
           <div className="grid gap-2">
             <Label htmlFor="find">Tìm kiếm</Label>
             <Input
@@ -79,8 +92,8 @@ export function FindReplaceDialog() {
           </div>
         </div>
         <DialogFooter>
-          <Button onClick={() => setIsOpen(false)} variant="outline">Hủy</Button>
-          <Button onClick={handleReplaceAll} className="bg-primary text-primary-foreground">
+          <Button onClick={() => { play('click'); handleOpenChange(false); }} variant="outline">Hủy</Button>
+          <Button onClick={handleReplaceAll}>
             <Wand2 className="mr-2 h-4 w-4" />
             Thay thế tất cả
           </Button>
