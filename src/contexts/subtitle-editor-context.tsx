@@ -15,7 +15,7 @@ const initialState: EditorState = {
   selectedIds: new Set(),
   isProcessing: false,
   processingProgress: 0,
-  isProMode: false,
+  isProMode: true,
   fileName: '',
 };
 

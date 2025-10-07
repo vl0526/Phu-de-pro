@@ -69,11 +69,11 @@ export function Toolbar() {
           step="0.05"
           value={customSpeed}
           onChange={(e) => setCustomSpeed(e.target.value)}
+          onBlur={handleCustomSpeedApply}
           onKeyDown={(e) => e.key === 'Enter' && handleCustomSpeedApply()}
           className="h-9 w-24"
           placeholder="Tùy chỉnh"
         />
-        <Button size="sm" onClick={handleCustomSpeedApply}>Áp dụng</Button>
       </div>
       
       <div className="ml-auto flex items-center gap-2">

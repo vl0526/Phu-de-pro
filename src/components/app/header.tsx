@@ -72,12 +72,11 @@ export function AppHeader() {
     <header className="flex h-16 items-center justify-between border-b bg-card px-4 md:px-6 sticky top-0 z-30">
       <div className="flex items-center gap-3">
         <AppLogo className="h-8 w-8 text-primary" />
-        <h1 className="text-xl font-bold font-headline text-foreground">New Ui/Ux Best Pro</h1>
+        <h1 className="text-xl font-bold font-headline text-foreground">sUBTITLES Edit Pro</h1>
       </div>
       <div className="flex items-center gap-4">
         <div className="flex items-center space-x-2">
-          <Settings2 className="h-4 w-4" />
-          <Label htmlFor="pro-mode-switch">Chế độ Pro</Label>
+          <Label htmlFor="pro-mode-switch">BẬT MẶC ĐỊNH</Label>
           <Switch
             id="pro-mode-switch"
             checked={state.isProMode}
