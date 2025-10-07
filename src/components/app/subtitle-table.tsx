@@ -147,7 +147,7 @@ export function SubtitleTable() {
                 </TableHead>
               )}
               <TableHead className="w-[80px]">STT</TableHead>
-              <TableHead className="w-[200px]">Thời gian</TableHead>
+              <TableHead className="w-[240px]">Thời gian</TableHead>
               <TableHead>Nội dung</TableHead>
             </TableRow>
           </TableHeader>
@@ -163,11 +163,8 @@ export function SubtitleTable() {
                   </TableCell>
                 )}
                 <TableCell className="font-medium">{sub.id}</TableCell>
-                <TableCell>
-                  <div className="flex flex-col">
-                    <span>{formatMsToTime(sub.start)}</span>
-                    <span className="text-muted-foreground">{formatMsToTime(sub.end)}</span>
-                  </div>
+                <TableCell className="font-mono text-sm tracking-wider">
+                  {`${formatMsToTime(sub.start)} → ${formatMsToTime(sub.end)}`}
                 </TableCell>
                 <TableCell className="whitespace-pre-wrap">
                   <EditableCell subId={sub.id} initialText={sub.text} />
